@@ -12,7 +12,7 @@ subprojects {
     }
 }
 
-val mainClass = "io.papermc.paperclip.Main"
+val mainClass = "dev.menthamc.lightclip.Main"
 
 tasks.jar {
     val java6Jar = project(":java6").tasks.named("jar")
@@ -66,10 +66,10 @@ publishing {
             withoutBuildIdentifier()
 
             pom {
-                val repoPath = "PaperMC/Paperclip"
+                val repoPath = "MenthaMC/Lightclip"
                 val repoUrl = "https://github.com/$repoPath"
 
-                name.set("Paperclip")
+                name.set("Lightclip")
                 description.set(project.description)
                 url.set(repoUrl)
                 packaging = "jar"
@@ -94,6 +94,18 @@ publishing {
                         email.set("demonwav@gmail.com")
                         url.set("https://github.com/DemonWav")
                     }
+                    developer {
+                        id.set("Bacteriawa")
+                        name.set("Bacteriawa")
+                        email.set("A3167717663@hotmail.com")
+                        url.set("https://github.com/Bacteriawa")
+                    }
+                    developer {
+                        id.set("CoderFrish")
+                        name.set("Frish2021")
+                        email.set("1573880184@qq.com")
+                        url.set("https://github.com/CoderFrish")
+                    }
                 }
 
                 scm {
@@ -105,15 +117,12 @@ publishing {
         }
 
         repositories {
-            val url = if (isSnapshot) {
-                "https://repo.papermc.io/repository/maven-snapshots/"
-            } else {
-                "https://repo.papermc.io/repository/maven-releases/"
-            }
-
-            maven(url) {
-                credentials(PasswordCredentials::class)
-                name = "paper"
+            maven("https://repo.menthamc.com/repository/maven-snapshots/") {
+                name = "MenthaMC"
+                credentials(PasswordCredentials::class) {
+                    username = System.getenv("PRIVATE_MAVEN_REPO_USERNAME")
+                    password = System.getenv("PRIVATE_MAVEN_REPO_PASSWORD")
+                }
             }
         }
     }

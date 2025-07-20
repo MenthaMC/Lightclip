@@ -1,4 +1,4 @@
-package io.papermc.paperclip;
+package dev.menthamc.lightclip;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,22 +12,21 @@ import java.net.URLClassLoader;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Paperclip {
+public final class Lightclip {
 
     public static void main(final String[] args) {
         if (Path.of("").toAbsolutePath().toString().contains("!")) {
-            System.err.println("Paperclip may not run in a directory containing '!'. Please rename the affected folder.");
+            System.err.println("Lightclip may not run in a directory containing '!'. Please rename the affected folder.");
             System.exit(1);
         }
 
         final URL[] classpathUrls = setupClasspath();
 
-        final ClassLoader parentClassLoader = Paperclip.class.getClassLoader().getParent();
+        final ClassLoader parentClassLoader = Lightclip.class.getClassLoader().getParent();
         final URLClassLoader classLoader = new URLClassLoader(classpathUrls, parentClassLoader);
 
         final String mainClassName = findMainClass();
@@ -72,7 +71,7 @@ public final class Paperclip {
         final Map<String, Map<String, URL>> classpathUrls = extractAndApplyPatches(baseFile, patches, repoDir);
 
         // Exit if user has set `paperclip.patchonly` system property to `true`
-        if (Boolean.getBoolean("paperclip.patchonly")) {
+        if (Boolean.getBoolean("lightclip.patchonly")) {
             System.exit(0);
         }
 
@@ -89,7 +88,7 @@ public final class Paperclip {
     }
 
     private static PatchEntry[] findPatches() {
-        final InputStream patchListStream = Paperclip.class.getResourceAsStream("/META-INF/patches.list");
+        final InputStream patchListStream = Lightclip.class.getResourceAsStream("/META-INF/patches.list");
         if (patchListStream == null) {
             return new PatchEntry[0];
         }
@@ -101,12 +100,32 @@ public final class Paperclip {
         }
     }
 
+    private static String getDownloadContextFileName(boolean ignoreCountry) {
+        final String country = Util.getCountryByIp();
+        String base = "download-context";
+
+        if (ignoreCountry) {
+            return base;
+        }
+
+        if (country.equals("China")) {
+            return base + "-cn";
+        }
+
+        return base;
+    }
+
     private static DownloadContext findDownloadContext() {
-        final String line;
+        String line;
         try {
             line = Util.readResourceText("/META-INF/download-context");
         } catch (final IOException e) {
-            throw Util.fail("Failed to read download-context file", e);
+            // other download source does not found
+            try {
+                line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(true));
+            }catch (IOException e1){
+                throw Util.fail("Failed to read download-context file", e1);
+            }
         }
 
         return DownloadContext.parseLine(line);
@@ -119,7 +138,7 @@ public final class Paperclip {
         return findFileEntries("libraries.list");
     }
     private static FileEntry[] findFileEntries(final String fileName) {
-        final InputStream libListStream = Paperclip.class.getResourceAsStream("/META-INF/" + fileName);
+        final InputStream libListStream = Lightclip.class.getResourceAsStream("/META-INF/" + getDownloadContextFileName(false));
         if (libListStream == null) {
             return null;
         }

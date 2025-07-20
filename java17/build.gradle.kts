@@ -5,27 +5,30 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 
     withSourcesJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(17)
+    options.release.set(21)
 }
 
 repositories {
     mavenCentral()
+    maven("https://repo.menthamc.com/repository/maven-releases/")
+    maven("https://repo.menthamc.com/repository/maven-snapshots/")
 }
 
 dependencies {
     implementation("io.sigpipe:jbsdiff:1.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 }
 
 tasks.shadowJar {
-    val prefix = "paperclip.libs"
-    listOf("org.apache", "org.tukaani", "io.sigpipe").forEach { pack ->
+    val prefix = "lightclip.libs"
+    listOf("org.apache", "org.tukaani", "io.sigpipe", "com.google").forEach { pack ->
         relocate(pack, "$prefix.$pack")
     }
 

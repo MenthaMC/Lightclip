@@ -1,4 +1,4 @@
-package io.papermc.paperclip;
+package dev.menthamc.lightclip;
 
 import java.io.BufferedReader;
 import java.io.IOException;

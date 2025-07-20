@@ -7,22 +7,22 @@
  * MIT License
  */
 
-package io.papermc.paperclip;
+package dev.menthamc.lightclip;
 
 import java.lang.reflect.Method;
 
 public final class Main {
 
     public static void main(final String[] args) {
-        if (getJavaVersion() < 17) {
-            System.err.println("Minecraft 1.19 requires running the server with Java 17 or above. " +
+        if (getJavaVersion() < 21) {
+            System.err.println("Minecraft 1.20.6+ requires running the server with Java 21 or above. " +
                 "For information on how to update Java, see https://docs.papermc.io/misc/java-install");
             System.exit(1);
         }
 
         try {
-            final Class<?> paperclipClass = Class.forName("io.papermc.paperclip.Paperclip");
-            final Method mainMethod = paperclipClass.getMethod("main", String[].class);
+            final Class<?> lightclipClass = Class.forName("dev.menthamc.lightclip.Lightclip");
+            final Method mainMethod = lightclipClass.getMethod("main", String[].class);
             mainMethod.invoke(null, (Object) args);
         } catch (final Exception e) {
             e.printStackTrace();

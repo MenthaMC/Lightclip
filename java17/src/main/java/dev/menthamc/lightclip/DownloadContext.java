@@ -1,4 +1,4 @@
-package io.papermc.paperclip;
+package dev.menthamc.lightclip;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
