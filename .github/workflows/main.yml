@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "Publish" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "Publish" ]
+    branches: [ "main" ]
 
 permissions: write-all
 
