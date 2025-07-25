@@ -51,7 +51,7 @@ public final class Lightclip {
         final var repoDir = Path.of(System.getProperty("bundlerRepoDir", ""));
 
         final PatchEntry[] patches = findPatches();
-        final DownloadContext downloadContext = findDownloadContext();
+        DownloadContext downloadContext = findDownloadContext(false);
         if (patches.length > 0 && downloadContext == null) {
             throw new IllegalArgumentException("patches.list file found without a corresponding original-url file");
         }
@@ -61,7 +61,18 @@ public final class Lightclip {
             try {
                 downloadContext.download(repoDir);
             } catch (final IOException e) {
-                throw Util.fail("Failed to download original jar", e);
+                System.out.println("Failed to download jar with auto matched download context! Trying using default download context");
+                downloadContext = findDownloadContext(true);
+
+                if (downloadContext == null) {
+                    throw new IllegalStateException("Default download context not found!");
+                }
+
+                try {
+                    downloadContext.download(repoDir);
+                }catch (IOException ex2) {
+                    throw Util.fail("Failed to download original jar", ex2);
+                }
             }
             baseFile = downloadContext.getOutputFile(repoDir);
         } else {
@@ -103,9 +114,14 @@ public final class Lightclip {
     private static String getDownloadContextFileName(boolean ignoreCountry) {
         final String country = Util.getCountryByIp();
         String base = "download-context";
+        final String customized = System.getProperty("lightclip.downloadContext");
 
         if (ignoreCountry) {
             return base;
+        }
+
+        if (customized != null) {
+            return customized;
         }
 
         if (country.equals("China")) {
@@ -115,14 +131,14 @@ public final class Lightclip {
         return base;
     }
 
-    private static DownloadContext findDownloadContext() {
+    private static DownloadContext findDownloadContext(boolean ignoreCountry) {
         String line;
         try {
             line = Util.readResourceText("/META-INF/download-context");
         } catch (final IOException e) {
             // other download source does not found
             try {
-                line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(true));
+                line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(ignoreCountry));
             }catch (IOException e1){
                 throw Util.fail("Failed to read download-context file", e1);
             }
