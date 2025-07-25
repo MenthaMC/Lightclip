@@ -46,7 +46,6 @@ public final class Lightclip {
         final String mainClassName = findMainClass();
         System.out.println("Starting " + mainClassName);
 
-
         bootstrap(mainClassName, selectedClassLoader, args);
     }
 
@@ -90,7 +89,7 @@ public final class Lightclip {
 
                 try {
                     downloadContext.download(repoDir);
-                }catch (IOException ex2) {
+                } catch (IOException ex2) {
                     throw Util.fail("Failed to download original jar", ex2);
                 }
             }
@@ -231,7 +230,7 @@ public final class Lightclip {
         return findFileEntries("libraries.list");
     }
     private static FileEntry[] findFileEntries(final String fileName) {
-        final InputStream libListStream = Lightclip.class.getResourceAsStream("/META-INF/" + getDownloadContextFileName(false));
+        final InputStream libListStream = Lightclip.class.getResourceAsStream("/META-INF/" + fileName);
         if (libListStream == null) {
             return null;
         }
