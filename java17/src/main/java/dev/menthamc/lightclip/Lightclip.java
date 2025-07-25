@@ -134,7 +134,7 @@ public final class Lightclip {
     private static DownloadContext findDownloadContext(boolean ignoreCountry) {
         String line;
         try {
-            line = Util.readResourceText("/META-INF/download-context");
+            line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(false));
         } catch (final IOException e) {
             // other download source does not found
             try {

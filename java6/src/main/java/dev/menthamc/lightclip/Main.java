@@ -21,8 +21,8 @@ public final class Main {
         }
 
         try {
-            final Class<?> lightclipClass = Class.forName("dev.menthamc.lightclip.Lightclip");
-            final Method mainMethod = lightclipClass.getMethod("main", String[].class);
+            final Class<?> lightclipClazz = Class.forName("dev.menthamc.lightclip.Lightclip");
+            final Method mainMethod = lightclipClazz.getMethod("main", String[].class);
             mainMethod.invoke(null, (Object) args);
         } catch (final Exception e) {
             e.printStackTrace();
