@@ -211,12 +211,12 @@ public final class Lightclip {
     private static DownloadContext findDownloadContext(boolean ignoreCountry) {
         String line;
         try {
-            line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(false));
+            line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(ignoreCountry));
         } catch (final IOException e) {
             // other download source does not found
             try {
-                line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(ignoreCountry));
-            }catch (IOException e1){
+                line = Util.readResourceText("/META-INF/" + getDownloadContextFileName(true));
+            }catch (IOException e1) {
                 throw Util.fail("Failed to read download-context file", e1);
             }
         }
