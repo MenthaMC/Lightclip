@@ -143,6 +143,7 @@ public final class Lightclip {
         // Exit if user has set `paperclip.patchonly` or `lightclip.patchonly` system property to `true`
         if (Boolean.getBoolean("paperclip.patchonly")
                 || Boolean.getBoolean("lightclip.patchonly")) {
+            System.exit(0);
         }
 
         // Keep versions and libraries separate as the versions must come first
