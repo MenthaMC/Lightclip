@@ -57,7 +57,7 @@ public record DownloadContext(byte[] hash, URL url, String fileName) {
         ) {
             fileChannel.transferFrom(source, 0, Long.MAX_VALUE);
         } catch (final IOException e) {
-            Lightclip.logger.info("Failed to download {}", this.fileName);
+            Lightclip.logger.info(e, "Failed to download {}", this.fileName);
             e.printStackTrace();
             System.exit(1);
         }
