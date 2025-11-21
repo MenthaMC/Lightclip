@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Lightclip {
-    public static final Logger logger = new SimpleLogger("Lightsclip");
+    public static final Logger logger = new SimpleLogger("Lightclip");
 
     public static void main(final String[] args) {
         if (Path.of("").toAbsolutePath().toString().contains("!")) {
