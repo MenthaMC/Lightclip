@@ -9,6 +9,7 @@
 
 package dev.menthamc.lightclip;
 
+import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
 import io.sigpipe.jbsdiff.InvalidHeaderException;
 import io.sigpipe.jbsdiff.Patch;
 import java.io.BufferedOutputStream;
@@ -27,18 +28,18 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 
-record PatchEntry(
-    String location,
-    byte[] originalHash,
-    byte[] patchHash,
-    byte[] outputHash,
-    String originalPath,
-    String patchPath,
-    String outputPath
+public record PatchEntry(
+        String location,
+        byte[] originalHash,
+        byte[] patchHash,
+        byte[] outputHash,
+        String originalPath,
+        String patchPath,
+        String outputPath
 ) {
     private static boolean announced = false;
 
-    static PatchEntry[] parse(final BufferedReader reader) throws IOException {
+    public static PatchEntry[] parse(final BufferedReader reader) throws IOException {
         var result = new PatchEntry[8];
 
         int index = 0;
@@ -86,7 +87,7 @@ record PatchEntry(
         );
     }
 
-    void applyPatch(final Map<String, Map<String, URL>> urls, final Path originalRootDir, final Path repoDir) throws IOException {
+    public void applyPatch(final Map<String, Map<String, URL>> urls, final Path originalRootDir, final Path repoDir) throws IOException {
         final Path inputDir = originalRootDir.resolve("META-INF").resolve(this.location);
         final Path targetDir = repoDir.resolve(this.location);
 
@@ -101,7 +102,7 @@ record PatchEntry(
         }
 
         if (!announced) {
-            System.out.println("Applying patches");
+            Lightclip.logger.info("Applying patches");
             announced = true;
         }
 
@@ -115,7 +116,7 @@ record PatchEntry(
 
         // Get and verity patch data is correct
         final String fullPatchPath = "/META-INF/" + Util.endingSlash(this.location) + this.patchPath;
-        final InputStream patchStream = PatchEntry.class.getResourceAsStream(fullPatchPath);
+        final InputStream patchStream = MixinURLClassLoader.class.getResourceAsStream(fullPatchPath);
         if (patchStream == null) {
             throw new IllegalStateException("Patch file not found: " + fullPatchPath);
         }
@@ -135,7 +136,7 @@ record PatchEntry(
             ) {
                 Patch.patch(originalBytes, patchBytes, outStream);
             }
-        } catch (final CompressorException | InvalidHeaderException | IOException e) {
+        } catch (final InvalidHeaderException | IOException | CompressorException e) {
             // Don't move this `catch` clause to the outer try-with-resources
             // the Util.fail method never returns, so `close()` would never get called
             throw Util.fail("Failed to patch " + inputFile, e);

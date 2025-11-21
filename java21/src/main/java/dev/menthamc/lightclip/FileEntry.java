@@ -1,5 +1,7 @@
 package dev.menthamc.lightclip;
 
+import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +18,9 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 
-record FileEntry(byte[] hash, String id, String path) {
+public record FileEntry(byte[] hash, String id, String path) {
 
-    static FileEntry[] parse(final BufferedReader reader) throws IOException {
+    public static FileEntry[] parse(final BufferedReader reader) throws IOException {
         var result = new FileEntry[8];
 
         int index = 0;
@@ -47,7 +49,7 @@ record FileEntry(byte[] hash, String id, String path) {
         }
     }
 
-    void extractFile(
+    public void extractFile(
         final Map<String, URL> urls,
         final PatchEntry[] patches,
         final String targetName,
@@ -69,7 +71,7 @@ record FileEntry(byte[] hash, String id, String path) {
         }
 
         final String filePath = Util.endingSlash(baseDir) + this.path;
-        InputStream fileStream = FileEntry.class.getResourceAsStream(filePath);
+        InputStream fileStream = MixinURLClassLoader.class.getResourceAsStream(filePath);
         if (fileStream == null) {
             // This file is not in our jar, but may be in the original
             if (originalRootDir == null) {

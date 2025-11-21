@@ -2,6 +2,7 @@ package dev.menthamc.lightclip;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +19,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-class Util {
+public class Util {
 
     private Util() {}
 
@@ -32,7 +33,7 @@ class Util {
         }
     }
 
-    static byte[] readBytes(final Path file) {
+    public static byte[] readBytes(final Path file) {
         try {
             return readFully(Files.newInputStream(file));
         } catch (final IOException e) {
@@ -64,7 +65,7 @@ class Util {
         } else {
             p = "/" + path;
         }
-        final InputStream stream = Util.class.getResourceAsStream(p);
+        final InputStream stream = MixinURLClassLoader.class.getResourceAsStream(p);
         if (stream == null) {
             return null;
         }
@@ -115,17 +116,19 @@ class Util {
         return i;
     }
 
-    static RuntimeException fail(final String message, final Throwable err) {
+    public static RuntimeException fail(final String message, final Throwable err) {
         System.err.println(message);
         if (err != null) {
-            err.printStackTrace();
+            Lightclip.logger.error(message, err);
+        } else {
+            Lightclip.logger.error(message);
         }
         System.exit(1);
         throw new InternalError();
     }
 
     @SuppressWarnings("unchecked")
-    static <X extends Throwable> RuntimeException sneakyThrow(final Throwable ex) throws X {
+    public static <X extends Throwable> RuntimeException sneakyThrow(final Throwable ex) throws X {
         throw (X) ex;
     }
 

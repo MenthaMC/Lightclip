@@ -14,7 +14,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 
-record DownloadContext(byte[] hash, URL url, String fileName) {
+public record DownloadContext(byte[] hash, URL url, String fileName) {
 
     public Path getOutputFile(final Path outputDir) {
         final Path cacheDir = outputDir.resolve("cache");
@@ -49,7 +49,7 @@ record DownloadContext(byte[] hash, URL url, String fileName) {
         }
         Files.deleteIfExists(outputFile);
 
-        System.out.println("Downloading " + this.fileName);
+        Lightclip.logger.info("Downloading {}", this.fileName);
 
         try (
             final ReadableByteChannel source = Channels.newChannel(this.url.openStream());
@@ -57,7 +57,7 @@ record DownloadContext(byte[] hash, URL url, String fileName) {
         ) {
             fileChannel.transferFrom(source, 0, Long.MAX_VALUE);
         } catch (final IOException e) {
-            System.err.println("Failed to download " + this.fileName);
+            Lightclip.logger.info("Failed to download {}", this.fileName);
             e.printStackTrace();
             System.exit(1);
         }

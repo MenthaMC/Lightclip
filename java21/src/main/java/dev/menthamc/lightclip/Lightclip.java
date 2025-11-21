@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Lightclip {
-    private static final Logger leavesLogger = new SimpleLogger("main");
+    public static final Logger logger = new SimpleLogger("Lightsclip");
 
     public static void main(final String[] args) {
         if (Path.of("").toAbsolutePath().toString().contains("!")) {
@@ -38,32 +38,72 @@ public final class Lightclip {
             System.exit(1);
         }
 
-        final URL[] classpathUrls = setupClasspath();
+        URLClassLoader classLoader;
+        final URL[] setupClasspathUrls = setupClasspath();
 
-        final ClassLoader parentClassLoader = Lightclip.class.getClassLoader();
-        final URLClassLoader selectedClassLoader = getClassLoaderForServer(classpathUrls, parentClassLoader);
+        if (Boolean.getBoolean("leavesclip.enable.mixin")
+                || Boolean.getBoolean("lightclip.enable.mixin")) {
+            BuildInfoInjector.inject();
+            overrideAsmVersion();
+            PluginResolver.extractMixins();
+            MixinJarResolver.resolveMixinJars();
+
+            System.setProperty("mixin.bootstrapService", MixinServiceKnotBootstrap.class.getName());
+            System.setProperty("mixin.service", MixinServiceKnot.class.getName());
+
+            final URL[] classpathUrls = Arrays.copyOf(setupClasspathUrls, setupClasspathUrls.length + MixinJarResolver.jarUrls.length);
+            System.arraycopy(MixinJarResolver.jarUrls, 0, classpathUrls, setupClasspathUrls.length, MixinJarResolver.jarUrls.length);
+
+            final ClassLoader parentClassLoader = Lightclip.class.getClassLoader();
+            MixinServiceKnot.classLoader = Lightclip.class.getClassLoader();
+
+            MixinBootstrap.init();
+            MixinEnvironment.getDefaultEnvironment().setSide(MixinEnvironment.Side.SERVER);
+
+            classLoader = new MixinURLClassLoader(classpathUrls, parentClassLoader);
+            ConditionChecker.setClassLoader(classLoader);
+            Mixins.addConfiguration("mixin-extras.init.mixins.json");
+            MixinServiceKnot.classLoader = classLoader;
+            MixinJarResolver.mixinConfigs.forEach(Mixins::addConfiguration);
+            decorateMixinConfigWithPluginId();
+            AccessWidenerManager.initAccessWidener(classLoader);
+        } else {
+            classLoader = new URLClassLoader(setupClasspathUrls, Lightclip.class.getClassLoader().getParent());
+        }
 
         final String mainClassName = findMainClass();
-        System.out.println("Starting " + mainClassName);
+        logger.info("Starting " + mainClassName);
 
-        bootstrap(mainClassName, selectedClassLoader, args);
+        final Thread runThread = generateThread(args, mainClassName, classLoader);
+        runThread.start();
     }
 
-    private static void bootstrap(String mainClassName, ClassLoader selectedClassLoader, String... args) {
+    private static void decorateMixinConfigWithPluginId() {
+        Mixins.getConfigs().forEach(config -> {
+            String mixinConfigName = config.getName();
+            String pluginId = MixinJarResolver.getPluginId(mixinConfigName);
+            if (pluginId == null) return;
 
+            IMixinConfig mixinConfig = config.getConfig();
+            mixinConfig.decorate(FabricUtil.KEY_MOD_ID, pluginId);
+            mixinConfig.decorate(FabricUtil.KEY_COMPATIBILITY, FabricUtil.COMPATIBILITY_LATEST);
+        });
+    }
+
+    private static Thread generateThread(Object args, String mainClassName, URLClassLoader classLoader) {
         final Thread runThread = new Thread(() -> {
             try {
-                final Class<?> mainClass = Class.forName(mainClassName, true, selectedClassLoader);
+                final Class<?> mainClass = Class.forName(mainClassName, true, classLoader);
                 final MethodHandle mainHandle = MethodHandles.lookup()
                     .findStatic(mainClass, "main", MethodType.methodType(void.class, String[].class))
                     .asFixedArity();
-                mainHandle.invoke((Object) args);
+                mainHandle.invoke(args);
             } catch (final Throwable t) {
                 throw Util.sneakyThrow(t);
             }
         }, "ServerMain");
-        runThread.setContextClassLoader(selectedClassLoader);
-        runThread.start();
+        runThread.setContextClassLoader(classLoader);
+        return runThread;
     }
 
     private static URL[] setupClasspath() {
@@ -100,9 +140,9 @@ public final class Lightclip {
 
         final Map<String, Map<String, URL>> classpathUrls = extractAndApplyPatches(baseFile, patches, repoDir);
 
-        // Exit if user has set `paperclip.patchonly` system property to `true`
-        if (Boolean.getBoolean("lightclip.patchonly")) {
-            System.exit(0);
+        // Exit if user has set `paperclip.patchonly` or `lightclip.patchonly` system property to `true`
+        if (Boolean.getBoolean("paperclip.patchonly")
+                || Boolean.getBoolean("lightclip.patchonly")) {
         }
 
         // Keep versions and libraries separate as the versions must come first
@@ -118,7 +158,7 @@ public final class Lightclip {
     }
 
     private static PatchEntry[] findPatches() {
-        final InputStream patchListStream = Lightclip.class.getResourceAsStream("/META-INF/patches.list");
+        final InputStream patchListStream = MixinURLClassLoader.class.getResourceAsStream("/META-INF/patches.list");
         if (patchListStream == null) {
             return new PatchEntry[0];
         }
@@ -130,51 +170,6 @@ public final class Lightclip {
         }
     }
 
-    private static URLClassLoader getClassLoaderForServer(URL[] setupClasspathUrls, ClassLoader parentClassLoader) {
-        if (Boolean.getBoolean("leavesclip.enable.mixin")) {
-            BuildInfoInjector.inject();
-            overrideAsmVersion();
-            PluginResolver.extractMixins();
-            MixinJarResolver.resolveMixinJars();
-
-            System.setProperty("mixin.bootstrapService", MixinServiceKnotBootstrap.class.getName());
-            System.setProperty("mixin.service", MixinServiceKnot.class.getName());
-
-            final URL[] classpathUrls = Arrays.copyOf(setupClasspathUrls, setupClasspathUrls.length + MixinJarResolver.jarUrls.length);
-            System.arraycopy(MixinJarResolver.jarUrls, 0, classpathUrls, setupClasspathUrls.length, MixinJarResolver.jarUrls.length);
-
-            MixinServiceKnot.classLoader = Lightclip.class.getClassLoader();
-
-            MixinBootstrap.init();
-            MixinEnvironment.getDefaultEnvironment().setSide(MixinEnvironment.Side.SERVER);
-
-            var ret = new MixinURLClassLoader(classpathUrls, parentClassLoader);
-
-            ConditionChecker.setClassLoader(ret);
-            MixinServiceKnot.classLoader = ret;
-            Mixins.addConfiguration("mixin-extras.init.mixins.json");
-            MixinJarResolver.mixinConfigs.forEach(Mixins::addConfiguration);
-            decorateMixinConfigWithPluginId();
-            AccessWidenerManager.initAccessWidener(ret);
-
-            return ret;
-        } else {
-            return new URLClassLoader(setupClasspathUrls, parentClassLoader);
-        }
-    }
-
-    private static void decorateMixinConfigWithPluginId() {
-        Mixins.getConfigs().forEach(config -> {
-            String mixinConfigName = config.getName();
-            String pluginId = MixinJarResolver.getPluginId(mixinConfigName);
-            if (pluginId == null) return;
-
-            IMixinConfig mixinConfig = config.getConfig();
-            mixinConfig.decorate(FabricUtil.KEY_MOD_ID, pluginId);
-            mixinConfig.decorate(FabricUtil.KEY_COMPATIBILITY, FabricUtil.COMPATIBILITY_LATEST);
-        });
-    }
-
     private static void overrideAsmVersion() {
         try {
             Class<?> asmClass = Class.forName("org.spongepowered.asm.util.asm.ASM");
@@ -183,7 +178,7 @@ public final class Lightclip {
             minorVersionField.setInt(null, 5);
 
         } catch (Exception e) {
-            leavesLogger.error("Failed to override asm version", e);
+            logger.error("Failed to override asm version", e);
         }
     }
 
@@ -230,7 +225,7 @@ public final class Lightclip {
         return findFileEntries("libraries.list");
     }
     private static FileEntry[] findFileEntries(final String fileName) {
-        final InputStream libListStream = Lightclip.class.getResourceAsStream("/META-INF/" + fileName);
+        final InputStream libListStream = MixinURLClassLoader.class.getResourceAsStream("/META-INF/" + fileName);
         if (libListStream == null) {
             return null;
         }

@@ -1,6 +1,6 @@
 plugins {
     java
-    id("io.github.goooler.shadow") version "8.1.7"
+    id("com.gradleup.shadow") version "9.1.0"
 }
 
 java {
@@ -20,8 +20,7 @@ repositories {
     maven("https://repo.spongepowered.org/maven/")
     maven("https://repo.leavesmc.org/releases/")
     maven("https://repo.leavesmc.org/snapshots/")
-    maven("https://repo.menthamc.com/repository/maven-releases/")
-    maven("https://repo.menthamc.com/repository/maven-snapshots/")
+    maven("https://repo.menthamc.org/repository/maven-public/")
 }
 
 dependencies {
@@ -30,7 +29,7 @@ dependencies {
     implementation("org.leavesmc:leaves-plugin-mixin-condition:1.0.0")
     implementation("io.github.llamalad7:mixinextras-common:0.4.1")
     implementation("net.fabricmc:access-widener:2.1.0")
-    implementation("net.fabricmc:sponge-mixin:0.15.5+mixin.0.8.7") {
+    implementation("net.fabricmc:sponge-mixin:0.16.4+mixin.0.8.7") {
         exclude(group = "com.google.code.gson", module = "gson")
         exclude(group = "com.google.guava", module = "guava")
     }

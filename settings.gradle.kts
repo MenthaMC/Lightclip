@@ -3,4 +3,4 @@ plugins {
 }
 
 rootProject.name = "lightclip"
-include("java6", "java17")
+include("java6", "java21")
