@@ -39,20 +39,7 @@ dependencies {
 
 tasks.shadowJar {
     val prefix = "lightclip.libs"
-    listOf(
-        "org.apache",
-        "org.tukaani",
-        "io.sigpipe",
-        "com.google",
-        "org.objectweb.asm",
-        "org.spongepowered",
-        "org.leavesmc",
-        "org.jetbrains",
-        "org.intellij",
-        "net.fabricmc",
-        "io.leangen",
-        "com.llamalad7"
-    ).forEach { pack ->
+    listOf("org.apache", "org.tukaani", "io.sigpipe", "com.google").forEach { pack ->
         relocate(pack, "$prefix.$pack")
     }
 
