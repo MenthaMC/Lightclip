@@ -1,6 +1,5 @@
 package dev.menthamc.lightclip.integrated.leavesclip.mixin.plugins.condition;
 
-import dev.menthamc.lightclip.Lightclip;
 import dev.menthamc.lightclip.integrated.leavesclip.logger.Logger;
 import dev.menthamc.lightclip.integrated.leavesclip.logger.SimpleLogger;
 import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
