@@ -1,4 +1,4 @@
-package dev.menthamc.lightclip.integrated.leavesclip.mixin;
+package org.leavesmc.leavesclip.mixin;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +11,9 @@ import java.net.URLClassLoader;
 import java.util.Objects;
 
 public class MixinURLClassLoader extends URLClassLoader {
+
     private final IMixinTransformer transformer;
+    private final ProtectionDomain dummyDomain = new ProtectionDomain(new CodeSource(this.getURLs()[0], (Certificate[]) null), null);
 
     public MixinURLClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
@@ -48,7 +50,7 @@ public class MixinURLClassLoader extends URLClassLoader {
             byte[] mixin = transformer.transformClass(MixinEnvironment.getCurrentEnvironment(), name, original);
             byte[] transformed = AccessWidenerManager.applyAccessWidener(mixin);
 
-            return defineClass(name, transformed, 0, transformed.length);
+            return defineClass(name, transformed, 0, transformed.length, dummyDomain);
         } catch (Exception e) {
             throw new ClassNotFoundException(name, e);
         }

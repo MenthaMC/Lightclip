@@ -9,7 +9,7 @@
 
 package dev.menthamc.lightclip;
 
-import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
+import org.leavesmc.leavesclip.mixin.MixinURLClassLoader;
 import io.sigpipe.jbsdiff.InvalidHeaderException;
 import io.sigpipe.jbsdiff.Patch;
 import java.io.BufferedOutputStream;

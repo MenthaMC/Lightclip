@@ -16,10 +16,10 @@
 // This file contains code derived from fabric-loader under the Apache-2.0 license
 // Modified for Leavesclip: removed code related to fabric-loader environment and implemented our own functionality
 
-package dev.menthamc.lightclip.integrated.leavesclip.mixin;
+package org.leavesmc.leavesclip.mixin;
 
 import dev.menthamc.lightclip.Lightclip;
-import dev.menthamc.lightclip.integrated.leavesclip.logger.SimpleLogger;
+import org.leavesmc.leavesclip.logger.SimpleLogger;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;

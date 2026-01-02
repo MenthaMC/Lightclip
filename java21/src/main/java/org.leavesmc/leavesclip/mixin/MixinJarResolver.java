@@ -1,7 +1,7 @@
-package dev.menthamc.lightclip.integrated.leavesclip.mixin;
+package org.leavesmc.leavesclip.mixin;
 
-import dev.menthamc.lightclip.integrated.leavesclip.logger.Logger;
-import dev.menthamc.lightclip.integrated.leavesclip.logger.SimpleLogger;
+import org.leavesmc.leavesclip.logger.Logger;
+import org.leavesmc.leavesclip.logger.SimpleLogger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

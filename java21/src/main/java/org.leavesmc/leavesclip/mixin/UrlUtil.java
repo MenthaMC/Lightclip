@@ -16,23 +16,29 @@
 // This file contains code derived from fabric-loader under the Apache-2.0 license
 // Modified for Leavesclip: removed code related to fabric-loader environment and implemented our own functionality
 
-package dev.menthamc.lightclip.integrated.leavesclip.mixin;
+package org.leavesmc.leavesclip.mixin;
 
-import org.spongepowered.asm.service.IMixinServiceBootstrap;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.CodeSource;
 
-public class MixinServiceKnotBootstrap implements IMixinServiceBootstrap {
-    @Override
-    public String getName() {
-        return "Knot";
+public final class UrlUtil {
+    public static final Path LOADER_CODE_SOURCE = getCodeSource(UrlUtil.class);
+
+    public static Path asPath(URL url) {
+        try {
+            return Paths.get(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
-    @Override
-    public String getServiceClassName() {
-        return "dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinServiceKnot";
-    }
+    public static Path getCodeSource(Class<?> cls) {
+        CodeSource cs = cls.getProtectionDomain().getCodeSource();
+        if (cs == null) return null;
 
-    @Override
-    public void bootstrap() {
-        // already done in Knot
+        return asPath(cs.getLocation());
     }
 }

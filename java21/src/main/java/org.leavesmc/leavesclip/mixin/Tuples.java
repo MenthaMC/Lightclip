@@ -1,4 +1,4 @@
-package dev.menthamc.lightclip.integrated.leavesclip.mixin;
+package org.leavesmc.leavesclip.mixin;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

@@ -1,8 +1,8 @@
-package dev.menthamc.lightclip.integrated.leavesclip.mixin.plugins.condition;
+package org.leavesmc.leavesclip.mixin.plugins.condition;
 
-import dev.menthamc.lightclip.integrated.leavesclip.logger.Logger;
-import dev.menthamc.lightclip.integrated.leavesclip.logger.SimpleLogger;
-import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
+import org.leavesmc.leavesclip.logger.Logger;
+import org.leavesmc.leavesclip.logger.SimpleLogger;
+import org.leavesmc.leavesclip.mixin.MixinURLClassLoader;
 import org.leavesmc.plugin.mixin.condition.BuildInfoProvider;
 import org.leavesmc.plugin.mixin.condition.data.BuildInfo;
 

@@ -2,7 +2,7 @@ package dev.menthamc.lightclip;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
+import org.leavesmc.leavesclip.mixin.MixinURLClassLoader;
 
 import java.io.IOException;
 import java.io.InputStream;

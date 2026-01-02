@@ -1,4 +1,4 @@
-package dev.menthamc.lightclip.integrated.leavesclip.logger;
+package org.leavesmc.leavesclip.logger;
 
 import org.spongepowered.asm.logging.ILogger;
 
