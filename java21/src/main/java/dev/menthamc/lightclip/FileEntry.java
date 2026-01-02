@@ -1,6 +1,6 @@
 package dev.menthamc.lightclip;
 
-import dev.menthamc.lightclip.integrated.leavesclip.mixin.MixinURLClassLoader;
+import org.leavesmc.leavesclip.mixin.MixinURLClassLoader;
 
 import java.io.BufferedReader;
 import java.io.IOException;

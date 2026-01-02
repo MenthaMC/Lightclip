@@ -8,6 +8,9 @@ import org.spongepowered.asm.mixin.transformer.IMixinTransformer;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 import java.util.Objects;
 
 public class MixinURLClassLoader extends URLClassLoader {
